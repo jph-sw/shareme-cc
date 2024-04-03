@@ -1,36 +1,61 @@
-import Pricing from '@/components/ui/Pricing/Pricing';
-import { createClient } from '@/utils/supabase/server';
+import DeployButton from "../components/DeployButton";
+import AuthButton from "../components/AuthButton";
+import { createClient } from "@/utils/supabase/server";
+import ConnectSupabaseSteps from "@/components/tutorial/ConnectSupabaseSteps";
+import SignUpUserSteps from "@/components/tutorial/SignUpUserSteps";
+import Header from "@/components/Header";
+import DashboardButton from "@/components/DashboardButton";
 
-export default async function PricingPage() {
-  const supabase = createClient();
+export default async function Index() {
+  const canInitSupabaseClient = () => {
+    // This function is just for the interactive tutorial.
+    // Feel free to remove it once you have Supabase connected.
+    try {
+      createClient();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  const { data: subscription, error } = await supabase
-    .from('subscriptions')
-    .select('*, prices(*, products(*))')
-    .in('status', ['trialing', 'active'])
-    .maybeSingle();
-
-  if (error) {
-    console.log(error);
-  }
-
-  const { data: products } = await supabase
-    .from('products')
-    .select('*, prices(*)')
-    .eq('active', true)
-    .eq('prices.active', true)
-    .order('metadata->index')
-    .order('unit_amount', { referencedTable: 'prices' });
+  const isSupabaseConnected = canInitSupabaseClient();
 
   return (
-    <Pricing
-      user={user}
-      products={products ?? []}
-      subscription={subscription}
-    />
+    <div className="flex-1 w-full flex flex-col gap-20 items-center">
+      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
+        <div className="w-full max-w-4xl flex justify-end items-center p-3 text-sm">
+          {isSupabaseConnected && <DashboardButton />}
+          {isSupabaseConnected && <AuthButton />}
+        </div>
+      </nav>
+
+      <div className="flex-1 flex flex-col gap-20 max-w-4xl px-3">
+        <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
+          <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
+            A new vision of your online persona
+          </h1>
+          <p className="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
+            We wanted to create a platform that allows you to create a profile
+            like never before.{" "}
+          </p>
+          <div className="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
+            <a
+              href="/login"
+              className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-black rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900"
+            >
+              Create your own!
+              <svg
+                className="ml-2 -mr-1 w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
