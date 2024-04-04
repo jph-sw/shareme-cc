@@ -5,6 +5,8 @@ import FetchDataSteps from "@/components/tutorial/FetchDataSteps";
 import Header from "@/components/Header";
 import { redirect } from "next/navigation";
 import EditProfile from "./edit-profile";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function ProtectedPage() {
   const supabase = createClient();
@@ -21,6 +23,11 @@ export default async function ProtectedPage() {
     <div className="flex-1 w-full flex flex-col gap-20 items-center">
       <div className="w-full">
         <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
+          <div className="w-full max-w-4xl flex justify-start items-center p-3 text-sm">
+            <Button variant="link" asChild>
+              <Link href="/">shareme.cc</Link>
+            </Button>
+          </div>
           <div className="w-full max-w-4xl flex justify-end items-center p-3 text-sm">
             <AuthButton />
           </div>
