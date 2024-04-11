@@ -76,62 +76,69 @@ export default function EditProfile(props: any) {
   const supabase = createClient();
 
   const saveProfile = async () => {
-    await supabase
-      .from("profiles")
-      .update({
-        title: user!.title,
-        description: user!.description,
-        content: user!.content,
-        background: user!.background,
-        username: user!.username,
-      })
-      .eq("id", props.user_id);
-    console.log("Profile saved successfully");
+    try {
+      await supabase
+        .from("profiles")
+        .update({
+          title: user!.title,
+          description: user!.description,
+          content: user!.content,
+          background: user!.background,
+          username: user!.username,
+        })
+        .eq("id", props.user_id);
+      
+      console.log("Profile saved successfully");
+    } catch (error) {
+      // Handle the error here
+      console.error("Error saving profile:", error);
+    }
   };
+  
 
   return (
-    <div className="flex justify-center w-full h-full">
+    <div className="w-full h-full">
+      <div className="flex justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="z-10" asChild>
+            <Button className="m-2" variant={"outline"}>
+              <Settings2 />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>Settings</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Change Background</DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <DropdownMenuRadioGroup
+                    value={user?.background}
+                    onValueChange={(e) => setUser({ ...user, background: e })}
+                  >
+                    <DropdownMenuRadioItem value="aurora">
+                      Aurora
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="grid">
+                      Grid
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="dots">
+                      Dots
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="gradient-animation">
+                      Gradient Animation
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+            <DropdownMenuItem>Change URL</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Button className="m-2 z-10" variant={"outline"} onClick={() => saveProfile()}><Save /></Button>
+      </div>
       <ProfileBg background={user?.background}>
-        <div className="w-full flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="z-10" asChild>
-              <Button className="m-2" variant={"ghost"}>
-                <Settings2 />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>Settings</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  Change Background
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuRadioGroup
-                      value={user?.background}
-                      onValueChange={(e) => setUser({ ...user, background: e })}
-                    >
-                      <DropdownMenuRadioItem value="aurora">
-                        Aurora
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="grid">
-                        Grid
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="dots">
-                        Dots
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="gradient-animation">
-                        Gradient Animation
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
-              <DropdownMenuItem>Change URL</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <div className="w-full flex justify-end"></div>
         <div className="flex justify-center align-center p-24">
           <Card className="max-w-[300px] min-w-max z-10">
             <CardHeader>
