@@ -44,6 +44,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -65,6 +66,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DialogClose } from "@radix-ui/react-dialog";
 interface Links {
   title: string;
   url: string;
@@ -79,9 +81,16 @@ interface User {
   links?: Links[];
   username?: string;
 }
+
+interface FeedbackMessage {
+  info: string,
+  error: boolean
+}
+
 export default function EditProfile(props: any) {
   console.log(props.user_data[0]);
   const [user, setUser] = useState<User>(props.user_data[0]);
+  const [checkUsernameStatus, setCheckusernameStatus] = useState<FeedbackMessage>({info: "", error: false});
   const supabase = createClient();
 
   const saveProfile = async () => {
@@ -102,6 +111,47 @@ export default function EditProfile(props: any) {
     } catch (error) {
       // Handle the error here
       console.error("Error saving profile:", error);
+    }
+  };
+
+  const checkName = async (name: string | undefined) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("username", name)
+        .limit(1);
+
+      if (error) {
+        throw error;
+      }
+
+      // If data exists, username is taken
+      if (data && data.length > 0) {
+        return true; // Username is taken
+      }
+
+      return false; // Username is available
+    } catch (error) {
+      console.error("Error checking username:", error);
+      return false; // Assume username is not available on error
+    }
+  };
+
+  const saveURI = async (username: string | undefined) => {
+    if (username != user.username) {
+      try {
+        const isTaken = await checkName(username);
+        if (isTaken) {
+          setCheckusernameStatus({...checkUsernameStatus, info: "Username is already taken", error: true });
+        } else if (!isTaken) {
+          setCheckusernameStatus({...checkUsernameStatus, info: "Username is available", error: false });
+        }
+      } catch (err) {
+        alert(err);
+      }
+    } else if (username == user.username) {
+      setCheckusernameStatus({...checkUsernameStatus, info: "Username is the same"});
     }
   };
 
@@ -141,22 +191,46 @@ export default function EditProfile(props: any) {
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
-            <DropdownMenuItem>
-            </DropdownMenuItem>
+            <DropdownMenuItem></DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-              <Dialog>
-                <DialogTrigger className="border-hidden z-10"><Button variant={"outline"}>Change URI</Button></DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Change URI</DialogTitle>
-                    <DialogDescription>
-                      <Input value={user.username} onChange={(e) => setUser({...user, username: e.target.value})}/>
-                      <Button className="my-2">Save</Button>
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
+        <Dialog>
+          <DialogTrigger className="z-10 m-2" asChild>
+            <Button variant={"outline"}>Change URI</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Change URI</DialogTitle>
+              <DialogDescription>
+                Important: Don't forget to save everything after this.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="">
+              <div className="flex gap-1">
+                <Input
+                  value={user.username}
+                  onChange={(e) =>
+                    setUser({ ...user, username: e.target.value })
+                  }
+                />
+
+                <Button
+                  className=""
+                  variant={"outline"}
+                  onClick={() => saveURI(user.username)}
+                >
+                  Check Availability
+                </Button>
+              </div>
+              <p>{checkUsernameStatus.info}</p>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button className="my-2">Close</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <Button
           className="m-2 z-10"
           variant={"outline"}

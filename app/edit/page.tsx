@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import EditProfile from "./edit-profile";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { ModeToggle } from "@/components/ui/theme-toggle";
 
 export default async function ProtectedPage() {
   const supabase = createClient();
@@ -28,7 +29,8 @@ export default async function ProtectedPage() {
               <Link href="/">shareme.cc</Link>
             </Button>
           </div>
-          <div className="w-full max-w-4xl flex justify-end items-center p-3 text-sm z-20">
+          <div className="w-full max-w-4xl flex justify-end items-center p-3 text-sm z-20 gap-2">
+            <ModeToggle />
             <AuthButton />
           </div>
         </nav>
