@@ -33,9 +33,28 @@ export default async function ProtectedPage() {
           </div>
         </nav>
         <div>
-          <EditProfile user_id={user!.id} />{" "}
+          <EditProfile
+            user_id={user!.id}
+            user_data={await getData({ user_id: user!.id })}
+          />
         </div>
       </div>
     </div>
   );
+}
+
+async function getData(props: { user_id: string }) {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", props.user_id);
+
+  if (error) {
+    console.error("Error fetching profile:", error);
+  } else {
+    console.log("Profile:", data);
+    return data;
+  }
 }

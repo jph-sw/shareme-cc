@@ -5,6 +5,7 @@ import ConnectSupabaseSteps from "@/components/tutorial/ConnectSupabaseSteps";
 import SignUpUserSteps from "@/components/tutorial/SignUpUserSteps";
 import Header from "@/components/Header";
 import DashboardButton from "@/components/DashboardButton";
+import { Highlight } from "@/components/ui/hero-hightlights";
 
 export default async function Index() {
   const canInitSupabaseClient = () => {
@@ -32,7 +33,7 @@ export default async function Index() {
       <div className="flex-1 flex flex-col gap-20 max-w-4xl px-3">
         <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
           <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
-            A new vision of your online persona
+            A <Highlight>new vision</Highlight> of your online persona
           </h1>
           <p className="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
             We wanted to create a platform that allows you to create a profile

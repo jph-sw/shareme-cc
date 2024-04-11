@@ -14,8 +14,48 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import Link from "next/link";
+import ProfileBg from "./profile-bg";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Car,
+  LoaderIcon,
+  Plus,
+  Save,
+  Settings2,
+  Settings2Icon,
+} from "lucide-react";
 import RenderProfile from "../p/[slug]/RenderProfile";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 interface Links {
   title: string;
   url: string;
@@ -31,26 +71,9 @@ interface User {
   username?: string;
 }
 export default function EditProfile(props: any) {
-  const [user, setUser] = useState<User>();
+  console.log(props.user_data[0]);
+  const [user, setUser] = useState<User>(props.user_data[0]);
   const supabase = createClient();
-
-  useEffect(() => {
-    const getProfile = async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", props.user_id);
-
-      if (error) {
-        console.error("Error fetching profile:", error);
-      } else {
-        console.log("Profile:", data);
-        setUser(data[0]);
-      }
-    };
-
-    getProfile();
-  }, []);
 
   const saveProfile = async () => {
     await supabase
@@ -67,61 +90,68 @@ export default function EditProfile(props: any) {
   };
 
   return (
-    <div className="flex justify-center">
-      <div className="w-1/2 p-12">
-        <p className="text-lg pb-1">Settings</p>
-        <div>
-          {user && (
-            <div className="flex flex-col gap-1">
-              <Label>Url</Label>
-              <Input
-                value={user.username}
-                onChange={(e) => setUser({ ...user, username: e.target.value })}
-              />
-              <Label>Title</Label>
-              <Input
-                value={user.title}
-                onChange={(e) => setUser({ ...user, title: e.target.value })}
-              />
-              <Label>Description</Label>
-              <Input
-                value={user.description}
-                onChange={(e) =>
-                  setUser({ ...user, description: e.target.value })
-                }
-              />
-              <Label>Content</Label>
-              <Input
-                value={user.content}
-                onChange={(e) => setUser({ ...user, content: e.target.value })}
-              />
-              <Label>Background</Label>
-              <Select
-                value={user.background}
-                onValueChange={(e) => setUser({ ...user, background: e })}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select a background" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Background</SelectLabel>
-                    <SelectItem value="aurora">Aurora</SelectItem>
-                    <SelectItem value="dots">Dots</SelectItem>
-                    <SelectItem value="grid">Grid</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          <Button className="mt-2" onClick={() => saveProfile()}>
-            Save
-          </Button>
+    <div className="flex justify-center w-full h-full">
+      <ProfileBg background={user?.background}>
+        <div className="w-full flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="z-10" asChild>
+              <Button className="m-2" variant={"ghost"}>
+                <Settings2 />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Settings</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  Change Background
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioGroup
+                      value={user?.background}
+                      onValueChange={(e) => setUser({ ...user, background: e })}
+                    >
+                      <DropdownMenuRadioItem value="aurora">
+                        Aurora
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="grid">
+                        Grid
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="dots">
+                        Dots
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="gradient-animation">
+                        Gradient Animation
+                      </DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+              <DropdownMenuItem>Change URL</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </div>
-      <div className="w-1/2">
-        <RenderProfile user={user} />
-      </div>
+        <div className="flex justify-center align-center p-24">
+          <Card className="max-w-[300px] min-w-max z-10">
+            <CardHeader>
+              <CardTitle>
+                <Input defaultValue={user?.title} />
+              </CardTitle>
+              <CardDescription>
+                <Input defaultValue={user?.description} />
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Textarea defaultValue={user?.content} />
+            </CardContent>
+            <CardFooter>
+              {user?.links?.map((link, index) => link.title)}
+              <Button variant={"outline"}>Add Link</Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </ProfileBg>
     </div>
   );
 }
