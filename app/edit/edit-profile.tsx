@@ -41,6 +41,15 @@ import {
 } from "@/components/ui/tooltip";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -87,14 +96,14 @@ export default function EditProfile(props: any) {
           username: user!.username,
         })
         .eq("id", props.user_id);
-      
+
       console.log("Profile saved successfully");
+      alert("Succesfully saved profile");
     } catch (error) {
       // Handle the error here
       console.error("Error saving profile:", error);
     }
   };
-  
 
   return (
     <div className="w-full h-full">
@@ -132,10 +141,29 @@ export default function EditProfile(props: any) {
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
-            <DropdownMenuItem>Change URL</DropdownMenuItem>
+            <DropdownMenuItem>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button className="m-2 z-10" variant={"outline"} onClick={() => saveProfile()}><Save /></Button>
+              <Dialog>
+                <DialogTrigger className="border-hidden z-10"><Button variant={"outline"}>Change URI</Button></DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Change URI</DialogTitle>
+                    <DialogDescription>
+                      <Input value={user.username} onChange={(e) => setUser({...user, username: e.target.value})}/>
+                      <Button className="my-2">Save</Button>
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+        <Button
+          className="m-2 z-10"
+          variant={"outline"}
+          onClick={() => saveProfile()}
+        >
+          <Save />
+        </Button>
       </div>
       <ProfileBg background={user?.background}>
         <div className="w-full flex justify-end"></div>
@@ -143,14 +171,25 @@ export default function EditProfile(props: any) {
           <Card className="max-w-[300px] min-w-max z-10">
             <CardHeader>
               <CardTitle>
-                <Input defaultValue={user?.title} />
+                <Input
+                  defaultValue={user?.title}
+                  onChange={(e) => setUser({ ...user, title: e.target.value })}
+                />
               </CardTitle>
               <CardDescription>
-                <Input defaultValue={user?.description} />
+                <Input
+                  defaultValue={user?.description}
+                  onChange={(e) =>
+                    setUser({ ...user, description: e.target.value })
+                  }
+                />
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Textarea defaultValue={user?.content} />
+              <Textarea
+                defaultValue={user?.content}
+                onChange={(e) => setUser({ ...user, content: e.target.value })}
+              />
             </CardContent>
             <CardFooter>
               {user?.links?.map((link, index) => link.title)}
