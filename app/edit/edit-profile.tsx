@@ -83,14 +83,16 @@ interface User {
 }
 
 interface FeedbackMessage {
-  info: string,
-  error: boolean
+  info: string;
+  error: boolean;
 }
 
 export default function EditProfile(props: any) {
   console.log(props.user_data[0]);
   const [user, setUser] = useState<User>(props.user_data[0]);
-  const [checkUsernameStatus, setCheckusernameStatus] = useState<FeedbackMessage>({info: "", error: false});
+  const [checkUsernameStatus, setCheckusernameStatus] =
+    useState<FeedbackMessage>({ info: "", error: false });
+  const [newLink, setNewLink] = useState<Links>({ title: "", url: "" });
   const supabase = createClient();
 
   const saveProfile = async () => {
@@ -139,21 +141,52 @@ export default function EditProfile(props: any) {
   };
 
   const saveURI = async (username: string | undefined) => {
-    if (username != user.username) {
-      try {
-        const isTaken = await checkName(username);
-        if (isTaken) {
-          setCheckusernameStatus({...checkUsernameStatus, info: "Username is already taken", error: true });
-        } else if (!isTaken) {
-          setCheckusernameStatus({...checkUsernameStatus, info: "Username is available", error: false });
-        }
-      } catch (err) {
-        alert(err);
+    try {
+      const isTaken = await checkName(username);
+      if (isTaken) {
+        setCheckusernameStatus({
+          ...checkUsernameStatus,
+          info: "Username is already taken",
+          error: true,
+        });
+      } else if (!isTaken) {
+        setCheckusernameStatus({
+          ...checkUsernameStatus,
+          info: "Username is available",
+          error: false,
+        });
       }
-    } else if (username == user.username) {
-      setCheckusernameStatus({...checkUsernameStatus, info: "Username is the same"});
+    } catch (err) {
+      alert(err);
     }
   };
+
+  async function addLink() {
+    try {
+      if (!newLink.title || !newLink.url) {
+        alert("Please provide both a title and URL for the link.");
+        return;
+      }
+
+      const updatedLinks = [...(user.links || []), newLink];
+
+      await supabase
+        .from("profiles")
+        .update({
+          links: updatedLinks,
+        })
+        .eq("id", props.user_id);
+
+      setUser({ ...user, links: updatedLinks });
+      setNewLink({ title: "", url: "" }); // Clear newLink state
+
+      console.log("Link added successfully");
+      alert("Link added successfully");
+    } catch (error) {
+      // Handle the error here
+      console.error("Error adding link:", error);
+    }
+  }
 
   return (
     <div className="w-full h-full">
@@ -266,8 +299,49 @@ export default function EditProfile(props: any) {
               />
             </CardContent>
             <CardFooter>
-              {user?.links?.map((link, index) => link.title)}
-              <Button variant={"outline"}>Add Link</Button>
+              <div className="">
+
+              {user?.links?.map((link, index) => <Button className="m-1" asChild><Link href={link.url}>{link.title}</Link></Button>)}
+              </div>
+
+              <Dialog>
+                <DialogTrigger className="z-10" asChild>
+                  <Button variant={"outline"}>Add Link</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Link</DialogTitle>
+                    <DialogDescription>
+                      Important: Don't forget to save everything after this.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="">
+                    <div className="mb-2">
+                      <Label>Link title</Label>
+                      <Input
+                        onChange={(e) =>
+                          setNewLink({ ...newLink, title: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label>URL</Label>
+                      <Input
+                        onChange={(e) =>
+                          setNewLink({ ...newLink, url: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button className="my-2" onClick={() => addLink()}>
+                        Add
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardFooter>
           </Card>
         </div>
