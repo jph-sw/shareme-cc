@@ -26,11 +26,14 @@ import {
 } from "@/components/ui/card";
 import {
   Car,
+  Copy,
+  CopySlash,
   LoaderIcon,
   Plus,
   Save,
   Settings2,
   Settings2Icon,
+  Share,
 } from "lucide-react";
 import RenderProfile from "../p/[slug]/RenderProfile";
 import {
@@ -93,6 +96,7 @@ export default function EditProfile(props: any) {
   const [checkUsernameStatus, setCheckusernameStatus] =
     useState<FeedbackMessage>({ info: "", error: false });
   const [newLink, setNewLink] = useState<Links>({ title: "", url: "" });
+  const [isEditURI, setIsEditURI] = useState(false);
   const supabase = createClient();
 
   const saveProfile = async () => {
@@ -188,6 +192,10 @@ export default function EditProfile(props: any) {
     }
   }
 
+  async function copyURI() {
+    navigator.clipboard.writeText(`https://shareme.cc/p/${user.username!}`);
+  }
+
   return (
     <div className="w-full h-full">
       <div className="flex justify-end">
@@ -224,12 +232,11 @@ export default function EditProfile(props: any) {
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
-            <DropdownMenuItem></DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Dialog>
-          <DialogTrigger className="z-10 m-2" asChild>
-            <Button variant={"outline"}>Change URI</Button>
+          <DialogTrigger asChild>
+            <Button className="m-2 z-10" variant={"outline"}>Change URI</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -271,6 +278,16 @@ export default function EditProfile(props: any) {
         >
           <Save />
         </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger className="z-10">
+              <Button className="m-2 z-10" onClick={() => copyURI()}>
+                <Copy />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Copy URI to clipboard</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <ProfileBg background={user?.background}>
         <div className="w-full flex justify-end"></div>
@@ -300,8 +317,11 @@ export default function EditProfile(props: any) {
             </CardContent>
             <CardFooter>
               <div className="">
-
-              {user?.links?.map((link, index) => <Button className="m-1" asChild><Link href={link.url}>{link.title}</Link></Button>)}
+                {user?.links?.map((link, index) => (
+                  <Button className="m-1" asChild>
+                    <Link href={link.url}>{link.title}</Link>
+                  </Button>
+                ))}
               </div>
 
               <Dialog>
