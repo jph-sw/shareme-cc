@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import DashboardButton from "@/components/DashboardButton";
 import { Highlight } from "@/components/ui/hero-hightlights";
 import { ModeToggle } from "@/components/ui/theme-toggle";
+import { CloudLightning, FastForward, HeartHandshake, Share } from "lucide-react";
 
 export default async function Index() {
   const canInitSupabaseClient = () => {
@@ -56,6 +57,42 @@ export default async function Index() {
                 <path d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"></path>
               </svg>
             </a>
+          </div>
+        </div>
+      </div>
+      <div className="h-screen flex flex-wrap gap-2 px-4">
+        <div className="md:bg-secondary rounded-lg p-4 w-full md:w-[15vw] md:h-[30vh]">
+          <div>
+            <div className="bg-gradient-to-r from-slate-50 to-slate-300 dark:from-indigo-500 dark:to-purple-500 max-w-min rounded-lg p-2 mb-2">
+              <HeartHandshake />
+            </div>
+            <h2 className="text-xl font-semibold">Easy</h2>
+            <p>
+              Creating a profile with shareme.cc is easier than with any other
+              service.
+            </p>
+          </div>
+        </div>
+        <div className="md:bg-secondary rounded-lg p-4 w-full  md:w-[15vw] md:h-[30vh]">
+          <div>
+            <div className="bg-gradient-to-r from-slate-50 to-slate-300 dark:from-indigo-500 dark:to-purple-500 max-w-min rounded-lg p-2 mb-2">
+              <FastForward />
+            </div>
+            <h2 className="text-xl font-semibold">Fast</h2>
+            <p>
+              You will be up and running in less than 3 clicks!
+            </p>
+          </div>
+        </div>
+        <div className="md:bg-secondary rounded-lg p-4 w-full md:w-[15vw] md:h-[30vh]">
+          <div>
+            <div className="bg-gradient-to-r from-slate-50 to-slate-300 dark:from-indigo-500 dark:to-purple-500 max-w-min rounded-lg p-2 mb-2">
+              <Share />
+            </div>
+            <h2 className="text-xl font-semibold">Share</h2>
+            <p>
+             You will be getting your own URL that you can share with your friends.
+            </p>
           </div>
         </div>
       </div>

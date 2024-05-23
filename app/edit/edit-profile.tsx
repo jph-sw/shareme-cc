@@ -28,12 +28,18 @@ import {
   Car,
   Copy,
   CopySlash,
+  Droplet,
+  Edit,
   LoaderIcon,
+  Menu,
+  MenuIcon,
   Plus,
   Save,
+  Settings,
   Settings2,
   Settings2Icon,
   Share,
+  X,
 } from "lucide-react";
 import RenderProfile from "../p/[slug]/RenderProfile";
 import {
@@ -196,6 +202,29 @@ export default function EditProfile(props: any) {
     navigator.clipboard.writeText(`https://shareme.cc/p/${user.username!}`);
   }
 
+  async function removeLink(index: number) {
+    try {
+      const updatedLinks = [...(user.links || [])]; // Provide a default empty array if user.links is undefined
+      updatedLinks.splice(index, 1); // Remove the link at the specified index
+      await supabase
+        .from("profiles")
+        .update({
+          links: updatedLinks,
+        })
+        .eq("id", props.user_id);
+  
+      setUser({ ...user, links: updatedLinks });
+  
+      console.log("Link removed successfully");
+      alert("Link removed successfully");
+    } catch (error) {
+      // Handle the error here
+      console.error("Error removing link:", error);
+    }
+  }
+  
+  
+
   return (
     <div className="w-full h-full">
       <div className="flex justify-end">
@@ -236,7 +265,9 @@ export default function EditProfile(props: any) {
         </DropdownMenu>
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="m-2 z-10" variant={"outline"}>Change URI</Button>
+            <Button className="m-2 z-10" variant={"outline"}>
+              Change URI
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -278,16 +309,34 @@ export default function EditProfile(props: any) {
         >
           <Save />
         </Button>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger className="z-10">
-              <Button className="m-2 z-10" onClick={() => copyURI()}>
-                <Copy />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Copy URI to clipboard</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <div className="flex z-10">
+          <div className="rounded border items-center px-1 py-0 m-2 me-0 flex group">
+            https://shareme.cc/p/{user.username}
+            <div className="invisible group-hover:visible">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant={"ghost"} className="px-0">
+                    <Menu />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>URI Settings</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Button
+                      className="w-full m-1 py-0"
+                      variant={"ghost"}
+                      onClick={() => copyURI()}
+                    >
+                      <Copy className="me-1" />
+                      Copy
+                    </Button>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </div>
       </div>
       <ProfileBg background={user?.background}>
         <div className="w-full flex justify-end"></div>
@@ -316,11 +365,14 @@ export default function EditProfile(props: any) {
               />
             </CardContent>
             <CardFooter>
-              <div className="">
+              <div className="flex flex-wrap">
                 {user?.links?.map((link, index) => (
-                  <Button className="m-1" asChild>
-                    <Link href={link.url}>{link.title}</Link>
-                  </Button>
+                  <div className="m-1 group hover:border rounded-lg p-1 items-center">
+                    <div className="flex justify-between items-center">
+                      <Link href={link.url}>{link.title}</Link>
+                      <div className="invisible group-hover:visible mx-0"><Button className="" variant={"ghost"} size={"icon"} onClick={() => removeLink(index)}><X /></Button></div>
+                    </div>
+                  </div>
                 ))}
               </div>
 
